@@ -1,0 +1,34 @@
+name: Discord Notification
+
+on:
+  push:
+    branches:
+      - main  # Change to your default branch
+  pull_request:
+    types:
+      - opened
+      - reopened
+      - closed
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Send Discord Notification
+        uses: fjogeleit/http-request-action@v1.1.1
+        with:
+          url: ${{ secrets.DISCORD_WEBHOOK_URL }}  # Use GitHub Secrets
+          method: POST
+          contentType: 'application/json'
+          data: |
+            {
+              "content": "A new event has occurred in the repository!",
+              "embeds": [
+                {
+                  "title": "${{ github.event_name }} Notification",
+                  "description": "${{ github.event.head_commit.message }}",
+                  "url": "${{ github.event.repository.html_url }}",
+                  "color": 5814783
+                }
+              ]
+            }
